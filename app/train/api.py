@@ -2,6 +2,7 @@ from . import train
 from flask import json, request, jsonify
 from app.models import Label
 from app import db
+from ..dbhelper import fetch_to_dict
 
 
 @train.route("/")
@@ -129,6 +130,30 @@ def add_label():
         )
         db.session.add(label)
         db.session.commit()
+
+    except Exception as e:
+        res["code"] = 10000
+        res["message"] = str(e)
+
+    return jsonify(res)
+
+
+@train.route("/label/sql/<int:id>", methods=["GET"])
+def get_label_by_sql(id):
+    res = {
+        "code": 0,
+        "message": "",
+        "data": {},
+    }
+
+    try:
+        sql = "select * from label where id=:id"
+        params = {"id": 2}
+        fetch = "one"
+        result = fetch_to_dict(sql, params, fecth=fetch)
+        print(result)
+
+        res["data"] = result
 
     except Exception as e:
         res["code"] = 10000
